@@ -23,14 +23,14 @@ class ReCaptchaField(forms.CharField):
 
         super(ReCaptchaField, self).__init__(*args, **kwargs)
 
-    def clean(self, values):
+    def clean(self, value):
 
         # Disable the check if we run a test unit
         if os.environ.get('RECAPTCHA_DISABLE', None) is not None:
-            return values[0]
+            return value
 
-        super(ReCaptchaField, self).clean(values[0])
-        response_token = values[0]
+        super(ReCaptchaField, self).clean(value)
+        response_token = value
 
         try:
             r = requests.post(
@@ -59,7 +59,7 @@ class ReCaptchaField(forms.CharField):
                     code='score',
                     params={'score': json_response['score']},
                 )
-            return values[0]
+            return value
         else:
             if 'error-codes' in json_response:
                 if 'missing-input-secret' in json_response['error-codes'] or \
